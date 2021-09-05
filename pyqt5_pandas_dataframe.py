@@ -7,6 +7,8 @@ from PyQt5.QtCore import *
 from PyQt5.QtGui import *
 from PyQt5.QtWidgets import *
 
+import datetime 
+
 
 class HTMLDelegate(QStyledItemDelegate):
     def paint(self, painter, option, index):
@@ -90,28 +92,45 @@ class QtDataFrame(QAbstractTableModel):
         self._df.reset_index(inplace=True, drop=True)
         self.layoutChanged.emit()
 
+        
+class LoginForm(QDialog):
+    def __init__(self, parent=None):
+        print('...')
+        
 class WindowD(QWidget):
     def __init__(self, parent=None):
         super().__init__();
         list_encodings=['Select Encoding', 'utf-8', 'cp932'] 
-        hbox0=QHBoxLayout(self)
+        hbox_outline=QHBoxLayout(self)
+        hbox0=QHBoxLayout()
+        hbox1=QHBoxLayout()
+        hbox2=QHBoxLayout()
+        #
+        vbox0=QVBoxLayout()
+        vbox1=QVBoxLayout()
         #
         vl0 = QVBoxLayout()
         holiz0=QHBoxLayout()
         holiz0.addWidget(QLabel('Latest'))
+        holiz0.setAlignment(Qt.AlignCenter)
         hl0 = QHBoxLayout()
         self.combo0=QComboBox();
         self.combo0.addItems( list_encodings )
         hl0.addWidget(self.combo0)
-        self.loadBtn0 = QPushButton("Select File", self)
-        hl0.addWidget(self.loadBtn0)
-        self.pathLE0 = QLineEdit(self)
-        hl0.addWidget(self.pathLE0)
+        hl0.addWidget(QLabel(" .... ") )
+        hl0.addWidget(QLabel(" **** ") )
+        hl0.setAlignment(Qt.AlignLeft)
+        #
+        #self.loadBtn0 = QPushButton("Select File", self)
+        #hl0.addWidget(self.loadBtn0)
+        #self.pathLE0 = QLineEdit(self)
+        #hl0.addWidget(self.pathLE0)
         vl0.addLayout(holiz0)
         vl0.addLayout(hl0)
         #self.pandasTv0 = QtWidgets.QTableView(self)
         self.pandasTv0 = QTableView(self)
         vl0.addWidget(self.pandasTv0)
+        vl0.setAlignment(Qt.AlignBottom)
         #
         #
         vl1 = QVBoxLayout()
@@ -133,17 +152,37 @@ class WindowD(QWidget):
         #
         hbox0.addLayout(vl0)
         hbox0.addLayout(vl1)
-        vbox0=QVBoxLayout()
-        vbox0.addWidget(QLabel('Automatic'))
-        vbox0.addWidget(QPushButton('Start'))
-        vbox0.addWidget(QLabel(' '))
-        vbox0.addWidget(QLabel(' '))
-        vbox0.addWidget(QLabel('Manual'))
-        vbox0.addWidget(QPushButton('Deep Learning'))
-        vbox0.addWidget(QPushButton('Send'))
-        hbox0.addLayout(vbox0)
+        #
+        self.text_browser_0=QTextBrowser()
+        self.text_browser_0.setText("horizontal line");
+        #hbox1.addWidget(QLabel(" horiozontal line "));
+        hbox1.addWidget(self.text_browser_0 )
+        self.text_browser_1=QTextBrowser()
+        self.text_browser_1.setText('app started at ' + datetime.datetime.now().strftime('%Y/%m/%d %H:%M:%S') )
+        hbox2.addWidget(self.text_browser_1 )
+        
+        vbox0.addLayout(hbox0)
+        #vbox0.addWidget(QLabel('*******'))
+        vbox0.addLayout(hbox1)
+        vbox0.addLayout(hbox2)
+        #
+        self.push_button_login=QPushButton('Login')
+        vbox1.addWidget(self.push_button_login);
+        vbox1.addWidget(QLabel('Automatic'))
+        vbox1.addWidget(QPushButton('Start'))
+        vbox1.addWidget(QLabel(' '))
+        vbox1.addWidget(QLabel(' '))
+        vbox1.addWidget(QLabel('Manual'))
+        vbox1.addWidget(QPushButton('Deep Learning'))
+        vbox1.addWidget(QPushButton('Send'))
+        vbox1.setAlignment(Qt.AlignBottom) # PyQt5.QtCore.Qt.AlignBottom
+        #
+        hbox_outline.addLayout(vbox0)
+        hbox_outline.addLayout(vbox1)
+        #
         self.setWindowTitle('Main Window')
-        self.loadBtn0.clicked.connect(self.loadFile0)
+        self.push_button_login.clicked.connect(self.login)
+        #self.loadBtn0.clicked.connect(self.loadFile0)
         self.pandasTv0.setItemDelegate(HTMLDelegate())
         self.pandasTv0.verticalHeader().setSectionResizeMode(QHeaderView.ResizeToContents)
         self.pandasTv0.setSortingEnabled(True)
@@ -152,7 +191,50 @@ class WindowD(QWidget):
         self.pandasTv1.setItemDelegate(HTMLDelegate())
         self.pandasTv1.verticalHeader().setSectionResizeMode(QHeaderView.ResizeToContents)
         self.pandasTv1.setSortingEnabled(True)
-
+    
+    def login(self):
+        print('login button clicked at', datetime.datetime.now().strftime('%Y-%m-%d %H:%M:%S'))
+        qdlg0=QDialog();
+        frm_lyt=QFormLayout()
+        line_edit_0=QLineEdit('Login');
+        frm_lyt.addRow("line0", line_edit_0)
+        line_edit_1=QLineEdit();
+        frm_lyt.addRow("line1", line_edit_1)
+        combo_0=QComboBox();
+        combo_0.addItems( ['A', 'B', 'C', 'D'] )
+        frm_lyt.addRow("Type:", combo_0)
+        line_edit_username=QLineEdit();
+        frm_lyt.addRow("username: ", line_edit_username)
+        dialog_button_box0 = QDialogButtonBox(); # QtWidgets.QDialogButtonBox();
+        dialog_button_box0.setOrientation(Qt.Horizontal)
+        #dialog_button_box0.setStandardButtons(QtWidgets.QDialogButtonBox.Ok | QtWidgets.QDialogButtonBox.Cancel )
+        dialog_button_box0.setStandardButtons(QDialogButtonBox.Ok | QDialogButtonBox.Cancel | QDialogButtonBox.Apply )
+        #self.buttonBox.setObjectName("buttonBox")
+        frm_lyt.addWidget(dialog_button_box0);
+        qdlg0.setWindowTitle("Login Form")
+        qdlg0.setLayout(frm_lyt)
+        #
+        dialog_button_box0.clicked.connect(qdlg0.accept)
+        dialog_button_box0.rejected.connect(qdlg0.reject)
+        #
+        #qdlg0.exec_();
+        if qdlg0.exec_()==QDialog.Accepted:
+            dict_login={'line0':[line_edit_0.text()], 'line1':[line_edit_1.text()], 'combo0':[combo_0.currentText()],
+                       'username':[line_edit_username.text() ] }
+            self.df_login=pd.DataFrame(dict_login)
+            print('df_login=\n', self.df_login)
+        #print('qdlg0 exec_=', qdlg0.exec_(), ' qdialog Accepted', QDialog.Accepted)
+        """ 
+        def showdialog():
+            dlg = QDialog()
+            b1 = QPushButton("ok",dlg)
+            b1.move(50,50)
+            dlg.setWindowTitle("Dialog") 
+            dlg.setWindowModality(Qt.ApplicationModal)
+            dlg.exec_()
+        """
+        
+        
     def loadFile0(self):
         print('check encoding!')
         fileName, _ = QtWidgets.QFileDialog.getOpenFileName(self, "Open File", "",  "CSV Files (*csv)");
